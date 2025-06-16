@@ -11,7 +11,7 @@ import {
   Info, 
   Gift,
   Trash2,
-  MarkAsRead
+  Check
 } from 'lucide-react';
 
 interface DriverNotificationsProps {
@@ -174,7 +174,7 @@ const DriverNotifications = ({ onBack }: DriverNotificationsProps) => {
               onClick={markAllAsRead}
               className="text-blue-600"
             >
-              <MarkAsRead className="h-4 w-4 mr-1" />
+              <Check className="h-4 w-4 mr-1" />
               Mark All Read
             </Button>
           )}
@@ -262,7 +262,7 @@ const DriverNotifications = ({ onBack }: DriverNotificationsProps) => {
                               onClick={() => markAsRead(notification.id)}
                               className="h-8 w-8 p-0 text-blue-600"
                             >
-                              <MarkAsRead className="h-4 w-4" />
+                              <Check className="h-4 w-4" />
                             </Button>
                           )}
                           <Button
