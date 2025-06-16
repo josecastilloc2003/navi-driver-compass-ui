@@ -159,7 +159,7 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
                       </p>
                     </div>
                     <Badge variant="secondary">
-                      {Math.round((parseInt(schedule.end.split(':')[0]) - parseInt(schedule.start.split(':')[0]))} hours
+                      {Math.round((parseInt(schedule.end.split(':')[0]) - parseInt(schedule.start.split(':')[0])))} hours
                     </Badge>
                   </div>
                 ))}
