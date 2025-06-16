@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Car, User, MapPin, Shield, Clock, Star } from 'lucide-react';
+import { Car, User, MapPin } from 'lucide-react';
 
 interface EntryPageProps {
   onNavigate: (page: 'driver-signup' | 'driver-signin' | 'user-signup' | 'user-signin') => void;
@@ -30,31 +30,6 @@ const EntryPage = ({ onNavigate }: EntryPageProps) => {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Join thousands of drivers earning money on their schedule, or book reliable rides with trusted drivers in your community.
             </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="text-center p-6">
-              <div className="w-12 h-12 gradient-navi rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Flexible Schedule</h3>
-              <p className="text-gray-600 text-sm">Drive when you want, earn on your terms</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-12 h-12 gradient-success rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Safe & Secure</h3>
-              <p className="text-gray-600 text-sm">Background checked drivers and secure payments</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-12 h-12 gradient-warning rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Top Rated</h3>
-              <p className="text-gray-600 text-sm">Highly rated drivers and excellent service</p>
-            </div>
           </div>
 
           {/* Action Cards */}
