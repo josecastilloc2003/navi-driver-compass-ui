@@ -86,6 +86,30 @@ const DriverBookings = () => {
         duration: '20 mins',
         estimatedEarnings: '$24.50',
         status: 'scheduled'
+      },
+      {
+        id: '6',
+        service: 'Premium Ride',
+        customer: 'Robert Wilson',
+        date: '2024-01-18',
+        time: '8:30 AM',
+        pickup: 'Hotel Grand Plaza',
+        dropoff: 'International Airport',
+        duration: '50 mins',
+        estimatedEarnings: '$65.00',
+        status: 'scheduled'
+      },
+      {
+        id: '7',
+        service: 'Standard Ride',
+        customer: 'Jennifer Lee',
+        date: '2024-01-19',
+        time: '5:45 PM',
+        pickup: 'Shopping Mall',
+        dropoff: 'Residential Area',
+        duration: '35 mins',
+        estimatedEarnings: '$38.00',
+        status: 'scheduled'
       }
     ]
   };
@@ -214,6 +238,21 @@ const DriverBookings = () => {
     return bookings[activeTab as keyof typeof bookings] || [];
   };
 
+  const getEmptyMessage = () => {
+    switch (activeTab) {
+      case 'current':
+        return "You don't have any active rides right now.";
+      case 'pending':
+        return "No pending ride requests at the moment.";
+      case 'future':
+        return "No upcoming rides scheduled.";
+      case 'past':
+        return "No completed rides to show.";
+      default:
+        return "No bookings to display.";
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
@@ -261,13 +300,7 @@ const DriverBookings = () => {
               No {activeTab} bookings
             </h3>
             <p className="text-gray-500 max-w-sm">
-              {activeTab === 'current' 
-                ? "You don't have any active rides right now."
-                : activeTab === 'pending'
-                ? "No pending ride requests at the moment."
-                : activeTab === 'future'
-                ? "No upcoming rides scheduled."
-                : "No completed rides to show."}
+              {getEmptyMessage()}
             </p>
           </div>
         )}

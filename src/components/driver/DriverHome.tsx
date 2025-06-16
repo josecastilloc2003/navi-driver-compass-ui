@@ -16,30 +16,37 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-const DriverHome = () => {
+interface DriverHomeProps {
+  onNavigateToBookings?: () => void;
+  onNavigateToCalendar?: () => void;
+  onNavigateToEarnings?: () => void;
+  onNavigateToSafety?: () => void;
+  onNavigateToNotifications?: () => void;
+}
+
+const DriverHome = ({ 
+  onNavigateToBookings,
+  onNavigateToCalendar,
+  onNavigateToEarnings,
+  onNavigateToSafety,
+  onNavigateToNotifications
+}: DriverHomeProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const quickActions = [
-    {
-      title: 'Active Tasks',
-      description: 'View current bookings',
-      icon: Navigation,
-      color: 'gradient-navi',
-      action: () => console.log('Navigate to current bookings')
-    },
     {
       title: 'Calendar',
       description: 'Manage your schedule',
       icon: Calendar,
       color: 'gradient-success',
-      action: () => console.log('Open calendar')
+      action: onNavigateToCalendar || (() => console.log('Open calendar'))
     },
     {
       title: 'Earnings & Finances',
       description: '$245.50 today',
       icon: DollarSign,
       color: 'gradient-warning',
-      action: () => console.log('View earnings')
+      action: onNavigateToEarnings || (() => console.log('View earnings'))
     },
     {
       title: 'Provider Milestones',
@@ -53,14 +60,14 @@ const DriverHome = () => {
       description: 'Emergency & safety features',
       icon: Shield,
       color: 'bg-red-500',
-      action: () => console.log('Open safety toolkit')
+      action: onNavigateToSafety || (() => console.log('Open safety toolkit'))
     },
     {
       title: 'Notifications',
       description: '3 new updates',
       icon: Bell,
       color: 'bg-indigo-500',
-      action: () => console.log('View notifications')
+      action: onNavigateToNotifications || (() => console.log('View notifications'))
     }
   ];
 
@@ -113,9 +120,10 @@ const DriverHome = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-red-600 border-red-200 hover:bg-red-50"
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  onClick={onNavigateToBookings}
                 >
-                  Go Offline
+                  Go to Current Bookings
                 </Button>
               </div>
             </CardContent>
