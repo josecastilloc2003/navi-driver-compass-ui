@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import { 
   User, 
   Camera, 
@@ -21,11 +27,13 @@ import {
   Clock,
   MapPin,
   Star,
-  TrendingUp
+  TrendingUp,
+  Menu
 } from 'lucide-react';
 
 const DriverAccount = () => {
   const [activeSection, setActiveSection] = useState('profile');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const menuItems = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -36,6 +44,16 @@ const DriverAccount = () => {
     { id: 'refer', label: 'Refer Friends', icon: Users },
     { id: 'about', label: 'About Navi', icon: Info },
   ];
+
+  const handleMenuItemClick = (itemId: string) => {
+    setActiveSection(itemId);
+    setIsDrawerOpen(false);
+  };
+
+  const getCurrentSectionTitle = () => {
+    const currentItem = menuItems.find(item => item.id === activeSection);
+    return currentItem ? currentItem.label : 'Profile';
+  };
 
   const renderProfileSection = () => (
     <div className="space-y-6">
@@ -340,14 +358,56 @@ const DriverAccount = () => {
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
-        <p className="text-gray-600">Manage your driver profile and preferences</p>
+      <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
+          <p className="text-gray-600 hidden sm:block">Manage your driver profile and preferences</p>
+        </div>
+        
+        {/* Mobile Menu Trigger */}
+        <div className="md:hidden">
+          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Menu className="h-4 w-4 mr-2" />
+                {getCurrentSectionTitle()}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Account Settings</DrawerTitle>
+              </DrawerHeader>
+              <div className="p-4 space-y-2">
+                {menuItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleMenuItemClick(item.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${
+                      activeSection === item.id
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                ))}
+                
+                <hr className="my-4" />
+                
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg text-red-600 hover:bg-red-50">
+                  <LogOut className="h-5 w-5" />
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar Menu */}
-        <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block w-64 bg-white border-r border-gray-200 overflow-y-auto">
           <div className="p-4 space-y-2">
             {menuItems.map((item) => (
               <button
@@ -374,7 +434,7 @@ const DriverAccount = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
           {renderContent()}
         </div>
       </div>
