@@ -28,7 +28,11 @@ import {
   MapPin,
   Star,
   TrendingUp,
-  Menu
+  Menu,
+  MessageCircle,
+  Phone,
+  Mail,
+  ExternalLink
 } from 'lucide-react';
 
 const DriverAccount = () => {
@@ -42,6 +46,7 @@ const DriverAccount = () => {
     { id: 'earnings', label: 'Earnings Activity', icon: DollarSign },
     { id: 'documents', label: 'Documents', icon: FileText },
     { id: 'refer', label: 'Refer Friends', icon: Users },
+    { id: 'support', label: 'Provider Support', icon: MessageCircle },
     { id: 'about', label: 'About Navi', icon: Info },
   ];
 
@@ -313,6 +318,99 @@ const DriverAccount = () => {
     </div>
   );
 
+  const renderSupportSection = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Contact Navi Support</CardTitle>
+          <CardDescription>Get help from our support team</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold">Phone Support</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">Call us for immediate assistance</p>
+                <p className="font-medium text-blue-600">+1 (555) 123-NAVI</p>
+                <p className="text-xs text-gray-500 mt-1">Available 24/7</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Mail className="h-5 w-5 text-green-600" />
+                  <h3 className="font-semibold">Email Support</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">Send us an email for detailed help</p>
+                <p className="font-medium text-green-600">drivers@navi.com</p>
+                <p className="text-xs text-gray-500 mt-1">Response within 2 hours</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex gap-2">
+            <Button className="flex-1" variant="outline">
+              <Phone className="h-4 w-4 mr-2" />
+              Call Now
+            </Button>
+            <Button className="flex-1" variant="outline">
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Live Chat Support</CardTitle>
+          <CardDescription>Chat with our support team in real-time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-50 rounded-lg p-6 text-center">
+            <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <h3 className="font-semibold text-gray-900 mb-2">Chat Support Coming Soon</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              We're working on bringing you real-time chat support. For now, please use phone or email support.
+            </p>
+            <Button disabled className="bg-gray-300 text-gray-500 cursor-not-allowed">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Chat Not Available Yet
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Links</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button variant="outline" className="w-full justify-start">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Driver Help Center
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Safety Guidelines
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Report an Issue
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Community Forum
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeSection) {
       case 'profile':
@@ -327,6 +425,8 @@ const DriverAccount = () => {
         return renderDocumentsSection();
       case 'refer':
         return renderReferSection();
+      case 'support':
+        return renderSupportSection();
       case 'about':
         return (
           <Card>

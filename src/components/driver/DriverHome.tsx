@@ -13,7 +13,8 @@ import {
   Navigation,
   Clock,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 
 interface DriverHomeProps {
@@ -156,24 +157,47 @@ const DriverHome = ({
               <p className="text-gray-600">Quick access to all your tools</p>
             </div>
 
+            {/* Performance Insights - Moved to top */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <TrendingUp className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-green-600 mb-1">$2,450</div>
+                    <div className="text-sm text-gray-600">This Month</div>
+                    <div className="text-xs text-green-600 mt-1">+15% from last month</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <Star className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-blue-600 mb-1">4.9</div>
+                    <div className="text-sm text-gray-600">Average Rating</div>
+                    <div className="flex justify-center mt-1">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">4.9</div>
-                  <div className="text-sm text-gray-600">Rating</div>
-                  <div className="flex justify-center mt-1">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">127</div>
+                  <div className="text-sm text-gray-600">Trips This Month</div>
+                  <div className="text-xs text-green-600 mt-1">+8 from last week</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600 mb-1">127</div>
-                  <div className="text-sm text-gray-600">Trips This Month</div>
-                  <div className="text-xs text-green-600 mt-1">+15% from last month</div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1">98%</div>
+                  <div className="text-sm text-gray-600">Acceptance Rate</div>
+                  <div className="text-xs text-blue-600 mt-1">Excellent!</div>
                 </CardContent>
               </Card>
             </div>
@@ -195,30 +219,6 @@ const DriverHome = ({
                   </CardContent>
                 </Card>
               ))}
-            </div>
-
-            {/* Recent Activity */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-              <div className="space-y-3">
-                {[
-                  { time: '2 hours ago', event: 'Completed trip to Airport', amount: '+$45.50' },
-                  { time: '4 hours ago', event: 'Completed trip to Downtown', amount: '+$28.75' },
-                  { time: '6 hours ago', event: 'Completed trip to Mall', amount: '+$15.25' }
-                ].map((activity, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{activity.event}</p>
-                          <p className="text-sm text-gray-500">{activity.time}</p>
-                        </div>
-                        <div className="text-green-600 font-semibold">{activity.amount}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
             </div>
           </div>
         </div>

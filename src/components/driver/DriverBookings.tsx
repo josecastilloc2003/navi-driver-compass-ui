@@ -6,42 +6,37 @@ import { Button } from '@/components/ui/button';
 import { 
   Clock, 
   MapPin, 
-  User, 
   Car, 
   Calendar, 
   DollarSign,
-  Star,
   Navigation,
-  Phone
+  Phone,
+  ArrowRight
 } from 'lucide-react';
 
 const DriverBookings = () => {
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState('pending-current');
 
   const bookings = {
     past: [
       {
         id: '1',
         service: 'Standard Ride',
-        customer: 'Sarah Johnson',
-        rating: 5,
         date: '2024-01-15',
         time: '2:30 PM',
-        pickup: '123 Main St, Downtown',
-        dropoff: 'Airport Terminal 1',
+        pickup: 'Downtown Area',
+        dropoff: 'Airport Terminal',
         duration: '45 mins',
         earnings: '$45.50',
         status: 'completed'
       },
       {
         id: '2',
-        service: 'Premium Ride',
-        customer: 'Michael Chen',
-        rating: 4,
+        service: 'Premium Ride', 
         date: '2024-01-15',
         time: '10:15 AM',
-        pickup: '456 Oak Ave, Midtown',
-        dropoff: '789 Pine St, Downtown',
+        pickup: 'Business District',
+        dropoff: 'Shopping Mall',
         duration: '25 mins',
         earnings: '$28.75',
         status: 'completed'
@@ -51,7 +46,6 @@ const DriverBookings = () => {
       {
         id: '3',
         service: 'Standard Ride',
-        customer: 'Emma Wilson',
         date: '2024-01-16',
         time: '3:00 PM',
         pickup: '321 Elm St, Uptown',
@@ -66,7 +60,6 @@ const DriverBookings = () => {
       {
         id: '4',
         service: 'Premium Ride',
-        customer: 'David Brown',
         date: '2024-01-17',
         time: '9:00 AM',
         pickup: '987 Cedar Blvd, West Side',
@@ -78,7 +71,6 @@ const DriverBookings = () => {
       {
         id: '5',
         service: 'Standard Ride',
-        customer: 'Lisa Martinez',
         date: '2024-01-17',
         time: '2:15 PM',
         pickup: 'University Campus',
@@ -86,38 +78,13 @@ const DriverBookings = () => {
         duration: '20 mins',
         estimatedEarnings: '$24.50',
         status: 'scheduled'
-      },
-      {
-        id: '6',
-        service: 'Premium Ride',
-        customer: 'Robert Wilson',
-        date: '2024-01-18',
-        time: '8:30 AM',
-        pickup: 'Hotel Grand Plaza',
-        dropoff: 'International Airport',
-        duration: '50 mins',
-        estimatedEarnings: '$65.00',
-        status: 'scheduled'
-      },
-      {
-        id: '7',
-        service: 'Standard Ride',
-        customer: 'Jennifer Lee',
-        date: '2024-01-19',
-        time: '5:45 PM',
-        pickup: 'Shopping Mall',
-        dropoff: 'Residential Area',
-        duration: '35 mins',
-        estimatedEarnings: '$38.00',
-        status: 'scheduled'
       }
     ]
   };
 
   const tabs = [
     { id: 'past', label: 'Past Bookings' },
-    { id: 'pending', label: 'Pending', badge: bookings.pending.length },
-    { id: 'current', label: 'Current', badge: bookings.current.length },
+    { id: 'pending-current', label: 'Pending/Current', badge: bookings.pending.length + bookings.current.length },
     { id: 'future', label: 'Future', badge: bookings.future.length }
   ];
 
@@ -136,25 +103,38 @@ const DriverBookings = () => {
     }
   };
 
-  const renderBookingCard = (booking: any) => (
+  const navigateToOrderDetails = (bookingId: string) => {
+    console.log('Navigate to order details for booking:', bookingId);
+    // This will later navigate to a detailed order page with map
+  };
+
+  const renderBookingCard = (booking: any, showCurrentButton = false) => (
     <Card key={booking.id} className="mb-4 hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <User className="h-5 w-5 text-blue-600" />
+              <Car className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">{booking.customer}</CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                <Car className="h-4 w-4" />
-                {booking.service}
-              </CardDescription>
+              <CardTitle className="text-lg">{booking.service}</CardTitle>
+              <CardDescription>Booking #{booking.id}</CardDescription>
             </div>
           </div>
-          <Badge className={getStatusColor(booking.status)}>
-            {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={getStatusColor(booking.status)}>
+              {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+            </Badge>
+            {showCurrentButton && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => navigateToOrderDetails(booking.id)}
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       
@@ -167,7 +147,7 @@ const DriverBookings = () => {
           <span>{booking.duration}</span>
         </div>
 
-        {/* Locations */}
+        {/* Locations - Only show pickup/dropoff areas for past bookings */}
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
@@ -186,7 +166,7 @@ const DriverBookings = () => {
           </div>
         </div>
 
-        {/* Earnings and Rating */}
+        {/* Earnings */}
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-green-600" />
@@ -197,17 +177,10 @@ const DriverBookings = () => {
               <span className="text-xs text-gray-500">(estimated)</span>
             )}
           </div>
-          
-          {booking.rating && (
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{booking.rating}.0</span>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
-        {activeTab === 'pending' && (
+        {activeTab === 'pending-current' && booking.status === 'confirmed' && (
           <div className="flex gap-2 pt-2">
             <Button size="sm" className="flex-1 gradient-navi text-white">
               <Navigation className="h-4 w-4 mr-1" />
@@ -235,15 +208,16 @@ const DriverBookings = () => {
   );
 
   const getCurrentBookings = () => {
+    if (activeTab === 'pending-current') {
+      return [...bookings.pending, ...bookings.current];
+    }
     return bookings[activeTab as keyof typeof bookings] || [];
   };
 
   const getEmptyMessage = () => {
     switch (activeTab) {
-      case 'current':
-        return "You don't have any active rides right now.";
-      case 'pending':
-        return "No pending ride requests at the moment.";
+      case 'pending-current':
+        return "No pending or current rides at the moment.";
       case 'future':
         return "No upcoming rides scheduled.";
       case 'past':
@@ -251,6 +225,47 @@ const DriverBookings = () => {
       default:
         return "No bookings to display.";
     }
+  };
+
+  const renderPendingCurrentContent = () => {
+    const pendingBookings = bookings.pending;
+    const currentBookings = bookings.current;
+    
+    return (
+      <div className="space-y-6">
+        {/* Pending Orders Section */}
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-3">Pending Orders</h3>
+          {pendingBookings.length > 0 ? (
+            <div className="space-y-4">
+              {pendingBookings.map(booking => renderBookingCard(booking))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-gray-500">No pending orders at the moment</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Current Orders Section */}
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-3">Current Orders</h3>
+          {currentBookings.length > 0 ? (
+            <div className="space-y-4">
+              {currentBookings.map(booking => renderBookingCard(booking, true))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-gray-500">No current orders</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -287,9 +302,11 @@ const DriverBookings = () => {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {getCurrentBookings().length > 0 ? (
+        {activeTab === 'pending-current' ? (
+          renderPendingCurrentContent()
+        ) : getCurrentBookings().length > 0 ? (
           <div className="space-y-4">
-            {getCurrentBookings().map(renderBookingCard)}
+            {getCurrentBookings().map(booking => renderBookingCard(booking))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -297,7 +314,7 @@ const DriverBookings = () => {
               <Calendar className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No {activeTab} bookings
+              No {activeTab === 'pending-current' ? 'pending/current' : activeTab} bookings
             </h3>
             <p className="text-gray-500 max-w-sm">
               {getEmptyMessage()}

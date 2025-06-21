@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Clock, Save } from 'lucide-react';
-import { format, addDays, startOfDay, endOfDay } from 'date-fns';
+import { format, addDays, startOfDay, endOfDay, differenceInDays } from 'date-fns';
 
 interface DriverCalendarProps {
   onBack: () => void;
@@ -21,7 +21,17 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
     return `${hour}:00`;
   });
 
+  const canEditDate = (date: Date) => {
+    const daysDifference = differenceInDays(date, new Date());
+    return daysDifference >= 3;
+  };
+
   const saveSchedule = () => {
+    if (!canEditDate(selectedDate)) {
+      alert("Cannot change schedule within 3 days of the date");
+      return;
+    }
+    
     const dateKey = format(selectedDate, 'yyyy-MM-dd');
     setSchedules(prev => ({
       ...prev,
@@ -68,16 +78,22 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
               disabled={(date) => date < new Date() || date > addDays(new Date(), 90)}
               className="rounded-md border pointer-events-auto"
               modifiers={{
-                scheduled: (date) => hasSchedule(date)
+                scheduled: (date) => hasSchedule(date),
+                locked: (date) => !canEditDate(date)
               }}
               modifiersStyles={{
-                scheduled: { backgroundColor: '#3b82f6', color: 'white' }
+                scheduled: { backgroundColor: '#3b82f6', color: 'white' },
+                locked: { backgroundColor: '#f3f4f6', color: '#9ca3af', textDecoration: 'line-through' }
               }}
             />
             <div className="mt-4 space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-blue-500 rounded"></div>
                 <span className="text-sm">Days with scheduled hours</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                <span className="text-sm">Cannot edit (within 3 days)</span>
               </div>
             </div>
           </CardContent>
@@ -92,6 +108,14 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!canEditDate(selectedDate) && (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> Cannot modify schedule within 3 days of the selected date.
+                </p>
+              </div>
+            )}
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
@@ -99,6 +123,7 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
                   value={tempSchedule.start}
                   onChange={(e) => setTempSchedule(prev => ({ ...prev, start: e.target.value }))}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!canEditDate(selectedDate)}
                 >
                   {timeSlots.map(time => (
                     <option key={time} value={time}>{time}</option>
@@ -111,6 +136,7 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
                   value={tempSchedule.end}
                   onChange={(e) => setTempSchedule(prev => ({ ...prev, end: e.target.value }))}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!canEditDate(selectedDate)}
                 >
                   {timeSlots.map(time => (
                     <option key={time} value={time}>{time}</option>
@@ -119,7 +145,11 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
               </div>
             </div>
 
-            <Button onClick={saveSchedule} className="w-full gradient-navi text-white">
+            <Button 
+              onClick={saveSchedule} 
+              className="w-full gradient-navi text-white"
+              disabled={!canEditDate(selectedDate)}
+            >
               <Save className="h-4 w-4 mr-2" />
               Save Schedule
             </Button>
@@ -178,7 +208,7 @@ const DriverCalendar = ({ onBack }: DriverCalendarProps) => {
               <div>
                 <p className="text-yellow-800 font-medium text-sm">Important Notice</p>
                 <p className="text-yellow-700 text-sm mt-1">
-                  You can change your availability later in settings, but you must honor any bookings 
+                  You can change your availability up to 3 days before the scheduled date, but you must honor any bookings 
                   scheduled during the set availability.
                 </p>
               </div>

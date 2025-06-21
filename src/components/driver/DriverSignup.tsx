@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Car, Upload, FileText } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, addDays, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface DriverSignupProps {
@@ -22,6 +22,7 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    phone: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -37,10 +38,11 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
     seats: '',
     transmission: '',
     hasAC: false,
-    termsAccepted: false
+    termsAccepted: false,
+    selectedDates: {} as {[key: string]: {start: string, end: string}}
   });
 
-  const totalSteps = 5;
+  const totalSteps = 6; // Added one more step for completion
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -57,6 +59,11 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
       onNavigate('entry');
     }
   };
+
+  const timeSlots = Array.from({ length: 24 }, (_, i) => {
+    const hour = i.toString().padStart(2, '0');
+    return `${hour}:00`;
+  });
 
   const renderStep = () => {
     switch (currentStep) {
@@ -87,6 +94,18 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
                   className="mt-1"
                 />
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="mt-1"
+                placeholder="+1 (555) 123-4567"
+              />
             </div>
 
             <div>
@@ -303,47 +322,88 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
           <div className="space-y-4">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Set Your Availability</h2>
-              <p className="text-gray-600">Choose your preferred working schedule</p>
+              <p className="text-gray-600">Choose your preferred working schedule for the next 2 weeks</p>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-amber-800">
-                <strong>Important:</strong> You can change your availability later in settings, but you must honor any bookings scheduled during the set availability.
+                <strong>Important:</strong> You can change your availability later in settings (up to 3 days before), but you must honor any bookings scheduled during the set availability.
               </p>
             </div>
 
-            <div className="bg-white rounded-lg border p-6">
-              <h3 className="font-semibold mb-4">Available Days & Times (Next 2 Weeks)</h3>
-              <div className="grid grid-cols-7 gap-2 text-center text-sm mb-4">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <div key={day} className="font-medium text-gray-600">{day}</div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: 14 }, (_, i) => (
-                  <div key={i} className="aspect-square">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full h-full text-xs hover:bg-blue-50 hover:border-blue-300"
-                    >
-                      {i + 1}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 space-y-2">
-                <Label>Preferred Time Slots</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Morning (6AM-12PM)', 'Afternoon (12PM-6PM)', 'Evening (6PM-12AM)', 'Night (12AM-6AM)'].map((slot) => (
-                    <div key={slot} className="flex items-center space-x-2">
-                      <Checkbox id={slot} />
-                      <Label htmlFor={slot} className="text-sm">{slot}</Label>
+            <Card>
+              <CardHeader>
+                <CardTitle>Select Available Days & Times</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Calendar
+                  mode="multiple"
+                  selected={Object.keys(formData.selectedDates).map(dateStr => new Date(dateStr))}
+                  onSelect={(dates) => {
+                    const newSelectedDates: {[key: string]: {start: string, end: string}} = {};
+                    dates?.forEach(date => {
+                      const dateKey = format(date, 'yyyy-MM-dd');
+                      newSelectedDates[dateKey] = formData.selectedDates[dateKey] || { start: '09:00', end: '17:00' };
+                    });
+                    setFormData({ ...formData, selectedDates: newSelectedDates });
+                  }}
+                  disabled={(date) => date < new Date() || date > addDays(new Date(), 14)}
+                  className="rounded-md border pointer-events-auto"
+                />
+                
+                {Object.keys(formData.selectedDates).length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Set hours for selected days:</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Start Time</Label>
+                        <Select 
+                          value={Object.values(formData.selectedDates)[0]?.start || '09:00'}
+                          onValueChange={(value) => {
+                            const updatedDates = { ...formData.selectedDates };
+                            Object.keys(updatedDates).forEach(key => {
+                              updatedDates[key] = { ...updatedDates[key], start: value };
+                            });
+                            setFormData({ ...formData, selectedDates: updatedDates });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.map(time => (
+                              <SelectItem key={time} value={time}>{time}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>End Time</Label>
+                        <Select 
+                          value={Object.values(formData.selectedDates)[0]?.end || '17:00'}
+                          onValueChange={(value) => {
+                            const updatedDates = { ...formData.selectedDates };
+                            Object.keys(updatedDates).forEach(key => {
+                              updatedDates[key] = { ...updatedDates[key], end: value };
+                            });
+                            setFormData({ ...formData, selectedDates: updatedDates });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.map(time => (
+                              <SelectItem key={time} value={time}>{time}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         );
 
@@ -357,11 +417,8 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
 
             <div className="space-y-4">
               {[
-                { id: 'id', label: 'ID Documents', required: true },
-                { id: 'passport', label: 'Passport', required: true },
-                { id: 'background', label: 'Background Check', required: true },
-                { id: 'security', label: 'Security Training Certificate', required: false },
-                { id: 'firearm', label: 'Firearm Use Certificate', required: false }
+                { id: 'identity', label: 'Identity', required: true },
+                { id: 'license', label: 'License', required: true }
               ].map((doc) => (
                 <div key={doc.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -417,6 +474,48 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
           </div>
         );
 
+      case 6:
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Registration Complete!</h2>
+              <p className="text-gray-600 mt-2">Thank you for joining Navi as a driver</p>
+            </div>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">What's Next?</h3>
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">We'll send you a WhatsApp message with next steps</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Check your email for verification instructions</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Our team will review your documents within 24-48 hours</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button
+              onClick={() => onNavigate('entry')}
+              className="w-full gradient-navi text-white"
+            >
+              Return to Sign In
+            </Button>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -451,38 +550,42 @@ const DriverSignup = ({ onNavigate, onComplete }: DriverSignupProps) => {
         </Card>
 
         {/* Navigation */}
-        <div className="flex justify-between mt-6">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {currentStep === 1 ? 'Back to Home' : 'Previous'}
-          </Button>
-          
-          <Button
-            onClick={handleNext}
-            disabled={currentStep === 5 && !formData.termsAccepted}
-            className="flex items-center gap-2 gradient-navi text-white"
-          >
-            {currentStep === totalSteps ? 'Complete Registration' : 'Next'}
-            {currentStep < totalSteps && <ArrowRight className="h-4 w-4" />}
-          </Button>
-        </div>
+        {currentStep < 6 && (
+          <div className="flex justify-between mt-6">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {currentStep === 1 ? 'Back to Home' : 'Previous'}
+            </Button>
+            
+            <Button
+              onClick={handleNext}
+              disabled={currentStep === 5 && !formData.termsAccepted}
+              className="flex items-center gap-2 gradient-navi text-white"
+            >
+              {currentStep === totalSteps - 1 ? 'Complete Registration' : 'Next'}
+              {currentStep < totalSteps - 1 && <ArrowRight className="h-4 w-4" />}
+            </Button>
+          </div>
+        )}
 
         {/* Sign In Link */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
-            Already have a driver account?{' '}
-            <button
-              onClick={() => onNavigate('driver-signin')}
-              className="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Sign in here
-            </button>
-          </p>
-        </div>
+        {currentStep < 6 && (
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
+              Already have a driver account?{' '}
+              <button
+                onClick={() => onNavigate('driver-signin')}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Sign in here
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
