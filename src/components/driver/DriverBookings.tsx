@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,10 +24,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import OrderDetails from './OrderDetails';
 
 const DriverBookings = () => {
   const [activeTab, setActiveTab] = useState('pending-current');
   const [cancelReason, setCancelReason] = useState('');
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
 
   const bookings = {
     past: [
@@ -109,6 +110,10 @@ const DriverBookings = () => {
     ]
   };
 
+  if (showOrderDetails) {
+    return <OrderDetails onBack={() => setShowOrderDetails(false)} />;
+  }
+
   const tabs = [
     { id: 'past', label: 'Past Bookings' },
     { id: 'pending-current', label: 'Pending/Current', badge: bookings.pending.length + bookings.current.length },
@@ -132,7 +137,7 @@ const DriverBookings = () => {
 
   const navigateToOrderDetails = (bookingId: string) => {
     console.log('Navigate to order details for booking:', bookingId);
-    // This will later navigate to a detailed order page with map
+    setShowOrderDetails(true);
   };
 
   const handleCancelOrder = (bookingId: string, reason: string) => {
@@ -149,7 +154,7 @@ const DriverBookings = () => {
               <Car className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">{booking.service}</CardTitle>
+              <CardTitle className="text-lg">{booking.customerFirstName}</CardTitle>
               <CardDescription>Booking #{booking.id}</CardDescription>
             </div>
           </div>
@@ -171,13 +176,6 @@ const DriverBookings = () => {
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Customer Name */}
-        {booking.customerFirstName && (
-          <div className="flex items-center gap-2 text-gray-600">
-            <span className="text-sm font-medium">Customer: {booking.customerFirstName}</span>
-          </div>
-        )}
-
         {/* Date and Time */}
         <div className="flex items-center gap-2 text-gray-600">
           <Calendar className="h-4 w-4" />
