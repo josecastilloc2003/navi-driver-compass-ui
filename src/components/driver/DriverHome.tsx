@@ -157,7 +157,7 @@ const DriverHome = ({
               <p className="text-gray-600">Quick access to all your tools</p>
             </div>
 
-            {/* Performance Insights - Moved to top */}
+            {/* Performance Insights - Now at top */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h3>
               <div className="grid grid-cols-2 gap-4">

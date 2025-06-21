@@ -11,11 +11,24 @@ import {
   DollarSign,
   Navigation,
   Phone,
-  ArrowRight
+  ArrowRight,
+  AlertTriangle
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const DriverBookings = () => {
   const [activeTab, setActiveTab] = useState('pending-current');
+  const [cancelReason, setCancelReason] = useState('');
 
   const bookings = {
     past: [
@@ -24,8 +37,7 @@ const DriverBookings = () => {
         service: 'Standard Ride',
         date: '2024-01-15',
         time: '2:30 PM',
-        pickup: 'Downtown Area',
-        dropoff: 'Airport Terminal',
+        customerFirstName: 'Sarah',
         duration: '45 mins',
         earnings: '$45.50',
         status: 'completed'
@@ -35,8 +47,7 @@ const DriverBookings = () => {
         service: 'Premium Ride', 
         date: '2024-01-15',
         time: '10:15 AM',
-        pickup: 'Business District',
-        dropoff: 'Shopping Mall',
+        customerFirstName: 'Michael',
         duration: '25 mins',
         earnings: '$28.75',
         status: 'completed'
@@ -48,6 +59,7 @@ const DriverBookings = () => {
         service: 'Standard Ride',
         date: '2024-01-16',
         time: '3:00 PM',
+        customerFirstName: 'Emma',
         pickup: '321 Elm St, Uptown',
         dropoff: '654 Maple Ave, Suburbs',
         duration: '30 mins',
@@ -55,13 +67,27 @@ const DriverBookings = () => {
         status: 'confirmed'
       }
     ],
-    current: [],
+    current: [
+      {
+        id: '6',
+        service: 'Premium Ride',
+        date: '2024-01-16',
+        time: '1:30 PM',
+        customerFirstName: 'David',
+        pickup: '123 Main St, Downtown',
+        dropoff: '789 Oak Ave, Eastside',
+        duration: '25 mins',
+        estimatedEarnings: '$38.00',
+        status: 'in-progress'
+      }
+    ],
     future: [
       {
         id: '4',
         service: 'Premium Ride',
         date: '2024-01-17',
         time: '9:00 AM',
+        customerFirstName: 'Jessica',
         pickup: '987 Cedar Blvd, West Side',
         dropoff: 'Business District Plaza',
         duration: '40 mins',
@@ -73,6 +99,7 @@ const DriverBookings = () => {
         service: 'Standard Ride',
         date: '2024-01-17',
         time: '2:15 PM',
+        customerFirstName: 'Robert',
         pickup: 'University Campus',
         dropoff: '159 Valley Road',
         duration: '20 mins',
@@ -108,6 +135,11 @@ const DriverBookings = () => {
     // This will later navigate to a detailed order page with map
   };
 
+  const handleCancelOrder = (bookingId: string, reason: string) => {
+    console.log('Cancel order:', bookingId, 'Reason:', reason);
+    // Handle order cancellation logic here
+  };
+
   const renderBookingCard = (booking: any, showCurrentButton = false) => (
     <Card key={booking.id} className="mb-4 hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -139,6 +171,13 @@ const DriverBookings = () => {
       </CardHeader>
       
       <CardContent className="space-y-4">
+        {/* Customer Name */}
+        {booking.customerFirstName && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <span className="text-sm font-medium">Customer: {booking.customerFirstName}</span>
+          </div>
+        )}
+
         {/* Date and Time */}
         <div className="flex items-center gap-2 text-gray-600">
           <Calendar className="h-4 w-4" />
@@ -147,24 +186,26 @@ const DriverBookings = () => {
           <span>{booking.duration}</span>
         </div>
 
-        {/* Locations - Only show pickup/dropoff areas for past bookings */}
-        <div className="space-y-2">
-          <div className="flex items-start gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Pickup</p>
-              <p className="text-sm text-gray-600">{booking.pickup}</p>
+        {/* Locations - Only show for non-past bookings */}
+        {activeTab !== 'past' && booking.pickup && booking.dropoff && (
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">Pickup</p>
+                <p className="text-sm text-gray-600">{booking.pickup}</p>
+              </div>
+            </div>
+            <div className="ml-2 w-px h-4 bg-gray-300"></div>
+            <div className="flex items-start gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full mt-1.5"></div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">Dropoff</p>
+                <p className="text-sm text-gray-600">{booking.dropoff}</p>
+              </div>
             </div>
           </div>
-          <div className="ml-2 w-px h-4 bg-gray-300"></div>
-          <div className="flex items-start gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full mt-1.5"></div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Dropoff</p>
-              <p className="text-sm text-gray-600">{booking.dropoff}</p>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Earnings */}
         <div className="flex items-center justify-between pt-2 border-t">
@@ -179,8 +220,8 @@ const DriverBookings = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        {activeTab === 'pending-current' && booking.status === 'confirmed' && (
+        {/* Action Buttons - Only for current orders */}
+        {activeTab === 'pending-current' && booking.status === 'in-progress' && (
           <div className="flex gap-2 pt-2">
             <Button size="sm" className="flex-1 gradient-navi text-white">
               <Navigation className="h-4 w-4 mr-1" />
@@ -193,14 +234,52 @@ const DriverBookings = () => {
           </div>
         )}
         
+        {/* Action Buttons for Future Orders */}
         {activeTab === 'future' && (
           <div className="flex gap-2 pt-2">
             <Button size="sm" variant="outline" className="flex-1">
               View Details
             </Button>
-            <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
-              Cancel
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+                  Cancel
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    Cancel Order
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you unable to complete your order? Please let us know why:
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="py-4">
+                  <textarea
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="Please explain why you need to cancel this order..."
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+                  />
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setCancelReason('')}>
+                    Keep Order
+                  </AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => {
+                      handleCancelOrder(booking.id, cancelReason);
+                      setCancelReason('');
+                    }}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Cancel Order
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
       </CardContent>
